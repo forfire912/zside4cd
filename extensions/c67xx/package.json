@@ -1,0 +1,88 @@
+{
+  "name": "zside4cd-c67xx",
+  "displayName": "TI C67XX 支持",
+  "description": "TI C67XX系列DSP处理器开发支持",
+  "version": "1.0.0",
+  "publisher": "ZSide4CD",
+  "engines": {
+    "zside": "^1.0.0"
+  },
+  "categories": [
+    "嵌入式开发",
+    "调试器",
+    "DSP"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "processorTypes": [
+      {
+        "id": "ti_c67xx",
+        "name": "TI C67XX",
+        "family": "C6000 DSP",
+        "manufacturer": "Texas Instruments"
+      }
+    ],
+    "projectTemplates": [
+      {
+        "id": "c67xx-basic",
+        "name": "C67XX 基础项目",
+        "description": "DSP基础项目模板",
+        "processorType": "ti_c67xx",
+        "path": "./templates/basic"
+      },
+      {
+        "id": "c67xx-dsplib",
+        "name": "C67XX DSP库项目",
+        "description": "包含DSPLIB的项目模板",
+        "processorType": "ti_c67xx",
+        "path": "./templates/dsplib"
+      }
+    ],
+    "toolchains": [
+      {
+        "type": "ti-cgt",
+        "name": "TI 代码生成工具",
+        "compiler": "cl6x.exe",
+        "linker": "lnk6x.exe",
+        "debugger": "cg_xml.exe",
+        "defaultFlags": {
+          "compiler": [
+            "-mv6700",
+            "--abi=eabi",
+            "-O2"
+          ],
+          "linker": [
+            "-m=output.map",
+            "-o=output.out"
+          ]
+        }
+      }
+    ],
+    "debuggers": [
+      {
+        "type": "ti-xds",
+        "name": "TI XDS 调试器",
+        "config": {
+          "interface": "jtag"
+        }
+      },
+      {
+        "type": "ti-ccs",
+        "name": "TI CCS 调试器",
+        "config": {
+          "interface": "jtag"
+        }
+      }
+    ],
+    "programmers": [
+      {
+        "type": "ti-uniflash",
+        "name": "TI UniFlash 烧录"
+      },
+      {
+        "type": "ti-ccs",
+        "name": "TI CCS 烧录"
+      }
+    ]
+  }
+}

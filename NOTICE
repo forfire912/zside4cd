@@ -1,0 +1,120 @@
+# 第三方组件许可证声明
+# Third-Party Component Licenses
+
+ZSide4CD - 嵌入式开发集成环境
+Copyright (c) 2025 ZSide4CD Team
+
+本产品基于以下开源软件构建：
+This product is based on the following open source software:
+
+================================================================================
+
+## 1. VSCodium
+
+- **许可证 (License)**: MIT License
+- **版权 (Copyright)**: VSCodium Project
+- **官网 (Website)**: https://vscodium.com
+- **源码 (Source)**: https://github.com/VSCodium/vscodium
+- **描述 (Description)**: 社区驱动的免费 VS Code 二进制发行版
+  Community-driven, freely-licensed binary distribution of Microsoft's editor VS Code
+
+VSCodium 是 Microsoft VS Code 的自由开源替代品，移除了所有遥测和跟踪功能。
+VSCodium is a free and open-source alternative to Microsoft VS Code with all telemetry and tracking removed.
+
+================================================================================
+
+## 2. Visual Studio Code - Open Source ("Code - OSS")
+
+- **许可证 (License)**: MIT License
+- **版权 (Copyright)**: Microsoft Corporation
+- **官网 (Website)**: https://github.com/microsoft/vscode
+- **描述 (Description)**: 微软开源的代码编辑器
+  Microsoft's open source code editor
+
+Visual Studio Code 是一个功能强大的代码编辑器，优化用于构建和调试现代 Web 和云应用程序。
+Visual Studio Code is a powerful code editor optimized for building and debugging modern web and cloud applications.
+
+================================================================================
+
+## 3. Electron
+
+- **许可证 (License)**: MIT License
+- **版权 (Copyright)**: Electron contributors
+- **官网 (Website)**: https://www.electronjs.org
+- **源码 (Source)**: https://github.com/electron/electron
+- **描述 (Description)**: 使用 JavaScript、HTML 和 CSS 构建跨平台桌面应用
+  Build cross-platform desktop apps with JavaScript, HTML, and CSS
+
+Electron 是一个使用 Web 技术构建跨平台桌面应用程序的框架。
+Electron is a framework for building cross-platform desktop applications with web technologies.
+
+================================================================================
+
+## 4. Node.js
+
+- **许可证 (License)**: MIT License
+- **版权 (Copyright)**: Node.js contributors
+- **官网 (Website)**: https://nodejs.org
+- **源码 (Source)**: https://github.com/nodejs/node
+- **描述 (Description)**: JavaScript 运行时环境
+  JavaScript runtime built on Chrome's V8 JavaScript engine
+
+Node.js 是一个基于 Chrome V8 引擎的 JavaScript 运行环境。
+Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine.
+
+================================================================================
+
+## 5. Chromium
+
+- **许可证 (License)**: BSD License
+- **版权 (Copyright)**: The Chromium Authors
+- **官网 (Website)**: https://www.chromium.org
+- **描述 (Description)**: 开源网页浏览器项目
+  Open-source web browser project
+
+Chromium 是一个开源浏览器项目，为多个浏览器提供基础。
+Chromium is an open-source browser project that serves as the foundation for multiple browsers.
+
+================================================================================
+
+## 其他依赖组件 (Other Dependencies)
+
+本项目还使用了以下 npm 包和工具，它们各自拥有自己的许可证：
+This project also uses the following npm packages and tools, each with their own licenses:
+
+- TypeScript (Apache License 2.0)
+- Jest (MIT License)
+- 以及其他在 package.json 中列出的依赖项
+  And other dependencies listed in package.json
+
+================================================================================
+
+## 完整许可证文本 (Full License Texts)
+
+所有组件的完整许可证文本可以在以下位置找到：
+Full license texts for all components can be found at:
+
+- 项目根目录的 LICENSE 文件
+  LICENSE file in the project root
+  
+- node_modules 目录中各组件的 LICENSE 文件
+  LICENSE files in respective component directories under node_modules
+
+================================================================================
+
+## 许可证合规声明 (License Compliance Statement)
+
+ZSide4CD 严格遵守所有第三方组件的许可证要求。我们保留所有必要的版权声明，
+并在本文件中明确列出所有使用的开源组件。
+
+ZSide4CD strictly complies with all third-party component license requirements. 
+We retain all necessary copyright notices and clearly list all open source 
+components used in this file.
+
+如果您对许可证有任何疑问，请通过项目的 GitHub 仓库联系我们。
+If you have any questions about licensing, please contact us through the 
+project's GitHub repository.
+
+================================================================================
+
+最后更新 (Last Updated): 2025-01-01

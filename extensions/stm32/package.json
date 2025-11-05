@@ -1,0 +1,89 @@
+{
+  "name": "zside4cd-stm32",
+  "displayName": "STM32 支持",
+  "description": "STM32F429系列处理器开发支持",
+  "version": "1.0.0",
+  "publisher": "ZSide4CD",
+  "engines": {
+    "zside": "^1.0.0"
+  },
+  "categories": [
+    "嵌入式开发",
+    "调试器"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "processorTypes": [
+      {
+        "id": "stm32f429",
+        "name": "STM32F429",
+        "family": "ARM Cortex-M4",
+        "manufacturer": "STMicroelectronics"
+      }
+    ],
+    "projectTemplates": [
+      {
+        "id": "stm32-basic",
+        "name": "STM32 基础项目",
+        "description": "包含HAL库的基础项目模板",
+        "processorType": "stm32f429",
+        "path": "./templates/basic"
+      },
+      {
+        "id": "stm32-rtos",
+        "name": "STM32 RTOS项目",
+        "description": "包含FreeRTOS的项目模板",
+        "processorType": "stm32f429",
+        "path": "./templates/rtos"
+      }
+    ],
+    "toolchains": [
+      {
+        "type": "arm-gcc",
+        "name": "ARM GCC",
+        "compiler": "arm-none-eabi-gcc.exe",
+        "linker": "arm-none-eabi-ld.exe",
+        "debugger": "arm-none-eabi-gdb.exe",
+        "defaultFlags": {
+          "compiler": [
+            "-mcpu=cortex-m4",
+            "-mthumb",
+            "-mfpu=fpv4-sp-d16",
+            "-mfloat-abi=hard"
+          ],
+          "linker": [
+            "-specs=nosys.specs",
+            "-specs=nano.specs"
+          ]
+        }
+      }
+    ],
+    "debuggers": [
+      {
+        "type": "openocd",
+        "name": "OpenOCD",
+        "config": {
+          "interface": "stlink-v2",
+          "target": "stm32f4x"
+        }
+      },
+      {
+        "type": "stlink",
+        "name": "ST-Link",
+        "config": {
+          "interface": "swd"
+        }
+      }
+    ],
+    "programmers": [
+      {
+        "type": "openocd",
+        "name": "OpenOCD 烧录"
+      },
+      {
+        "type": "stlink",
+        "name": "ST-Link 烧录"
+      }
+    ]
+  }
+}

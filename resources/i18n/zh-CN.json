@@ -1,0 +1,176 @@
+{
+  "app": {
+    "name": "ZSide4CD",
+    "title": "ZSide4CD - 嵌入式开发IDE"
+  },
+  "menu": {
+    "file": {
+      "label": "文件",
+      "new": "新建",
+      "newProject": "新建项目...",
+      "open": "打开",
+      "openProject": "打开项目...",
+      "openFolder": "打开文件夹...",
+      "openFile": "打开文件...",
+      "save": "保存",
+      "saveAs": "另存为...",
+      "saveAll": "保存全部",
+      "close": "关闭",
+      "closeProject": "关闭项目",
+      "exit": "退出"
+    },
+    "edit": {
+      "label": "编辑",
+      "undo": "撤销",
+      "redo": "重做",
+      "cut": "剪切",
+      "copy": "复制",
+      "paste": "粘贴",
+      "selectAll": "全选",
+      "find": "查找",
+      "replace": "替换",
+      "findInFiles": "在文件中查找"
+    },
+    "build": {
+      "label": "构建",
+      "build": "构建",
+      "rebuild": "重新构建",
+      "clean": "清理",
+      "buildSettings": "构建设置..."
+    },
+    "debug": {
+      "label": "调试",
+      "start": "启动调试",
+      "stop": "停止调试",
+      "restart": "重新启动调试",
+      "stepOver": "单步跳过",
+      "stepInto": "单步进入",
+      "stepOut": "单步跳出",
+      "continue": "继续",
+      "toggleBreakpoint": "切换断点",
+      "debugSettings": "调试设置..."
+    },
+    "tools": {
+      "label": "工具",
+      "flash": "烧录程序",
+      "erase": "擦除Flash",
+      "toolchains": "工具链管理...",
+      "settings": "设置..."
+    },
+    "help": {
+      "label": "帮助",
+      "documentation": "文档",
+      "about": "关于"
+    }
+  },
+  "dialog": {
+    "newProject": {
+      "title": "新建项目",
+      "projectName": "项目名称",
+      "projectPath": "项目路径",
+      "processorType": "处理器类型",
+      "template": "项目模板",
+      "create": "创建",
+      "cancel": "取消"
+    },
+    "buildSettings": {
+      "title": "构建设置",
+      "optimization": "优化级别",
+      "defines": "宏定义",
+      "includePaths": "包含路径",
+      "libraryPaths": "库路径",
+      "linkerScript": "链接脚本",
+      "ok": "确定",
+      "cancel": "取消"
+    },
+    "debugSettings": {
+      "title": "调试设置",
+      "debugger": "调试器",
+      "serverType": "服务器类型",
+      "interface": "接口类型",
+      "device": "目标设备",
+      "svdFile": "SVD文件",
+      "ok": "确定",
+      "cancel": "取消"
+    },
+    "flashSettings": {
+      "title": "烧录设置",
+      "programmer": "编程器",
+      "interface": "接口类型",
+      "device": "目标设备",
+      "flashAddress": "Flash地址",
+      "verifyAfterFlash": "烧录后验证",
+      "flash": "烧录",
+      "cancel": "取消"
+    },
+    "toolchainManager": {
+      "title": "工具链管理",
+      "detected": "已检测的工具链",
+      "add": "添加",
+      "remove": "移除",
+      "setDefault": "设为默认",
+      "close": "关闭"
+    },
+    "settings": {
+      "title": "设置",
+      "general": "常规",
+      "editor": "编辑器",
+      "appearance": "外观",
+      "branding": "品牌定制",
+      "ok": "确定",
+      "cancel": "取消"
+    },
+    "about": {
+      "title": "关于 ZSide4CD",
+      "version": "版本",
+      "copyright": "版权所有",
+      "license": "许可证",
+      "basedOn": "基于",
+      "close": "关闭"
+    }
+  },
+  "processor": {
+    "stm32f429": "STM32F429",
+    "ti_c67xx": "TI C67XX"
+  },
+  "toolchain": {
+    "arm-gcc": "ARM GCC",
+    "ti-cgt": "TI 代码生成工具"
+  },
+  "template": {
+    "stm32-basic": "STM32 基础项目",
+    "stm32-rtos": "STM32 RTOS项目",
+    "c67xx-basic": "C67XX 基础项目"
+  },
+  "status": {
+    "ready": "就绪",
+    "building": "正在构建...",
+    "buildSuccess": "构建成功",
+    "buildFailed": "构建失败",
+    "debugging": "正在调试...",
+    "debugStarted": "调试已启动",
+    "debugStopped": "调试已停止",
+    "flashing": "正在烧录...",
+    "flashSuccess": "烧录成功",
+    "flashFailed": "烧录失败"
+  },
+  "error": {
+    "projectExists": "项目已存在",
+    "invalidProjectPath": "无效的项目路径",
+    "toolchainNotFound": "未找到工具链",
+    "buildFailed": "构建失败",
+    "debugFailed": "调试失败",
+    "flashFailed": "烧录失败",
+    "deviceNotConnected": "设备未连接",
+    "fileNotFound": "文件未找到"
+  },
+  "branding": {
+    "productName": "产品名称",
+    "companyName": "公司名称",
+    "copyright": "版权信息",
+    "basedOn": "基于",
+    "logo": "Logo图片",
+    "icon": "图标文件",
+    "aboutText": "关于文本"
+  }
+}

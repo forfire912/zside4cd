@@ -1,0 +1,39 @@
+{
+  "name": "zside4cd",
+  "version": "1.0.0",
+  "description": "基于VSCodium的中文化嵌入式开发IDE，支持STM32F429和TI C67XX系列处理器",
+  "main": "app/main.js",
+  "scripts": {
+    "start": "electron app/main.js",
+    "build": "node scripts/build.js",
+    "package": "node scripts/package.js",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
+  },
+  "keywords": [
+    "IDE",
+    "嵌入式开发",
+    "STM32",
+    "C67XX",
+    "VSCodium",
+    "中文化"
+  ],
+  "author": "ZSide4CD Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/forfire912/zside4cd.git"
+  },
+  "dependencies": {
+    "electron": "^25.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "jest": "^29.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}

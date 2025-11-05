@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZSide4CD - 嵌入式开发IDE</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- 顶部工具栏 -->
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <button id="btn-new-project" class="toolbar-btn" title="新建项目 (Ctrl+Shift+N)">
+          <span class="icon">📁</span> 新建项目
+        </button>
+        <button id="btn-open-project" class="toolbar-btn" title="打开项目 (Ctrl+Shift+O)">
+          <span class="icon">📂</span> 打开项目
+        </button>
+        <div class="toolbar-separator"></div>
+        <button id="btn-save" class="toolbar-btn" title="保存 (Ctrl+S)">
+          <span class="icon">💾</span> 保存
+        </button>
+      </div>
+      <div class="toolbar-right">
+        <button id="btn-build" class="toolbar-btn build-btn" title="构建 (F7)">
+          <span class="icon">🔨</span> 构建
+        </button>
+        <button id="btn-debug" class="toolbar-btn debug-btn" title="调试 (F5)">
+          <span class="icon">🐛</span> 调试
+        </button>
+        <button id="btn-flash" class="toolbar-btn flash-btn" title="烧录 (Ctrl+Alt+F)">
+          <span class="icon">⚡</span> 烧录
+        </button>
+      </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-container">
+      <!-- 侧边栏 -->
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <h3>项目浏览器</h3>
+        </div>
+        <div class="sidebar-content" id="project-tree">
+          <div class="empty-state">
+            <p>未打开项目</p>
+            <button id="btn-open-sidebar" class="btn-primary">打开项目</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 编辑器区域 -->
+      <div class="editor-container">
+        <div class="editor-tabs" id="editor-tabs">
+          <!-- 编辑器标签页 -->
+        </div>
+        <div class="editor-content" id="editor-content">
+          <div class="welcome-screen">
+            <h1>欢迎使用 ZSide4CD</h1>
+            <p class="subtitle">嵌入式开发集成环境</p>
+            
+            <div class="welcome-actions">
+              <div class="action-card">
+                <h3>🚀 快速开始</h3>
+                <ul>
+                  <li><a href="#" id="link-new-stm32">创建 STM32F429 项目</a></li>
+                  <li><a href="#" id="link-new-c67xx">创建 TI C67XX 项目</a></li>
+                  <li><a href="#" id="link-open-project">打开现有项目</a></li>
+                </ul>
+              </div>
+              
+              <div class="action-card">
+                <h3>📚 文档资源</h3>
+                <ul>
+                  <li><a href="#" id="link-user-guide">用户手册</a></li>
+                  <li><a href="#" id="link-api-docs">API 文档</a></li>
+                  <li><a href="#" id="link-examples">示例项目</a></li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="about-info">
+              <p>基于 <a href="https://vscodium.com" target="_blank">VSCodium</a> (MIT License)</p>
+              <p>版本 1.0.0 | Copyright © 2025 ZSide4CD Team</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 输出面板 -->
+        <div class="output-panel" id="output-panel">
+          <div class="output-header">
+            <span class="output-title">输出</span>
+            <button id="btn-clear-output" class="btn-icon" title="清除输出">🗑️</button>
+          </div>
+          <div class="output-content" id="output-content">
+            <pre>就绪</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 状态栏 -->
+    <div class="statusbar">
+      <div class="statusbar-left">
+        <span id="status-text">就绪</span>
+      </div>
+      <div class="statusbar-right">
+        <span id="status-processor">未选择处理器</span>
+        <span class="statusbar-separator">|</span>
+        <span id="status-toolchain">未配置工具链</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

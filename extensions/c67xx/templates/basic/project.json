@@ -1,0 +1,30 @@
+{
+  "name": "C67XX_Basic",
+  "version": "1.0.0",
+  "description": "TI C67XX DSP基础项目模板",
+  "processorType": "ti_c67xx",
+  "processor": {
+    "type": "ti_c67xx",
+    "series": "C6000",
+    "core": "TMS320C67x",
+    "frequency": "300MHz",
+    "architecture": "VLIW DSP"
+  },
+  "toolchain": {
+    "type": "ti-cgt",
+    "required": true
+  },
+  "build": {
+    "sourceDir": "src",
+    "buildDir": "build",
+    "outputName": "dsp_app"
+  },
+  "debug": {
+    "debugger": "xds",
+    "tool": "ccs"
+  },
+  "flash": {
+    "tool": "uniflash",
+    "method": "jtag"
+  }
+}

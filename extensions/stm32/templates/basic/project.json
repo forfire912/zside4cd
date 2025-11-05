@@ -1,0 +1,33 @@
+{
+  "name": "STM32F429_Basic",
+  "version": "1.0.0",
+  "description": "STM32F429基础项目模板",
+  "processorType": "stm32f429",
+  "processor": {
+    "type": "stm32f429",
+    "series": "STM32F4",
+    "core": "ARM Cortex-M4",
+    "frequency": "180MHz",
+    "flash": "2MB",
+    "ram": "256KB"
+  },
+  "toolchain": {
+    "type": "arm-gcc",
+    "required": true
+  },
+  "build": {
+    "sourceDir": "src",
+    "buildDir": "build",
+    "outputName": "firmware"
+  },
+  "debug": {
+    "debugger": "openocd",
+    "interface": "stlink",
+    "target": "stm32f4x"
+  },
+  "flash": {
+    "tool": "stlink",
+    "address": "0x08000000",
+    "size": "2M"
+  }
+}

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>工具链配置</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Microsoft YaHei", "微软雅黑", sans-serif;
+      background-color: #1e1e1e;
+      color: #cccccc;
+      padding: 20px;
+      font-size: 14px;
+    }
+
+    .dialog-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #252526;
+      border: 1px solid #3e3e42;
+      border-radius: 8px;
+      padding: 24px;
+    }
+
+    h2 {
+      color: #ffffff;
+      margin-bottom: 20px;
+      font-size: 20px;
+    }
+
+    .section {
+      margin-bottom: 24px;
+      padding: 16px;
+      background-color: #1e1e1e;
+      border-radius: 4px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #4fc3f7;
+      margin-bottom: 12px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: #cccccc;
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 8px 12px;
+      background-color: #2d2d30;
+      border: 1px solid #3e3e42;
+      border-radius: 4px;
+      color: #cccccc;
+      font-size: 14px;
+    }
+
+    input[type="text"]:focus,
+    select:focus {
+      outline: none;
+      border-color: #007acc;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .input-group input {
+      flex: 1;
+    }
+
+    button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.2s;
+    }
+
+    .btn-primary {
+      background-color: #0e639c;
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: #1177bb;
+    }
+
+    .btn-secondary {
+      background-color: #3e3e42;
+      color: #cccccc;
+    }
+
+    .btn-secondary:hover {
+      background-color: #4e4e4e;
+    }
+
+    .btn-success {
+      background-color: #388a34;
+      color: #ffffff;
+    }
+
+    .btn-success:hover {
+      background-color: #4a9f44;
+    }
+
+    .btn-danger {
+      background-color: #a1260d;
+      color: #ffffff;
+    }
+
+    .btn-danger:hover {
+      background-color: #c92a14;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid #3e3e42;
+    }
+
+    .detected-list {
+      margin-top: 12px;
+      padding: 12px;
+      background-color: #2d2d30;
+      border-radius: 4px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .detected-item {
+      padding: 8px;
+      margin-bottom: 8px;
+      background-color: #1e1e1e;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .detected-item:hover {
+      background-color: #2d2d30;
+    }
+
+    .detected-item.selected {
+      background-color: #0e639c;
+    }
+
+    .detected-item-name {
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .detected-item-path {
+      font-size: 12px;
+      color: #858585;
+    }
+
+    .message {
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+    }
+
+    .message.info {
+      background-color: #1e3a5f;
+      border-left: 4px solid #4fc3f7;
+    }
+
+    .message.success {
+      background-color: #1e3a1e;
+      border-left: 4px solid #4caf50;
+    }
+
+    .message.warning {
+      background-color: #3a3a1e;
+      border-left: 4px solid #ffa726;
+    }
+
+    .message.error {
+      background-color: #3a1e1e;
+      border-left: 4px solid #f44336;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .loading.active {
+      display: block;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border: 3px solid #3e3e42;
+      border-top-color: #4fc3f7;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .validation-error {
+      color: #f44336;
+      font-size: 12px;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .validation-error.show {
+      display: block;
+    }
+
+    .help-text {
+      font-size: 12px;
+      color: #858585;
+      margin-top: 4px;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background-color: #1e1e1e;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: #424242;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="dialog-container">
+    <h2>TI CGT C6000 工具链配置</h2>
+
+    <div id="message-container"></div>
+
+    <!-- 自动检测部分 -->
+    <div class="section">
+      <div class="section-title">🔍 自动检测工具链</div>
+      <p style="margin-bottom: 12px; color: #858585;">
+        系统将在常见位置搜索已安装的 TI CGT C6000 工具链。
+      </p>
+      <button class="btn-success" id="btn-detect">开始检测</button>
+      
+      <div class="loading" id="detecting-loading">
+        <div class="spinner"></div>
+        <p style="margin-top: 8px;">正在检测工具链...</p>
+      </div>
+
+      <div id="detected-list" class="detected-list" style="display: none;">
+        <!-- 检测结果将显示在这里 -->
+      </div>
+    </div>
+
+    <!-- 手动配置部分 -->
+    <div class="section">
+      <div class="section-title">⚙️ 手动配置工具链</div>
+      
+      <div class="form-group">
+        <label for="toolchain-name">工具链名称 *</label>
+        <input type="text" id="toolchain-name" placeholder="例如: TI CGT C6000 8.3.0" />
+        <div class="validation-error" id="error-name">请输入工具链名称</div>
+      </div>
+
+      <div class="form-group">
+        <label for="toolchain-version">版本号 *</label>
+        <input type="text" id="toolchain-version" placeholder="例如: 8.3.0" />
+        <div class="validation-error" id="error-version">请输入版本号</div>
+      </div>
+
+      <div class="form-group">
+        <label for="toolchain-path">工具链路径 *</label>
+        <div class="input-group">
+          <input type="text" id="toolchain-path" placeholder="例如: C:\ti\ccs\tools\compiler\ti-cgt-c6000_8.3.0\bin" />
+          <button class="btn-secondary" id="btn-browse">浏览...</button>
+        </div>
+        <div class="help-text">
+          请选择包含 cl6x.exe 的 bin 目录
+        </div>
+        <div class="validation-error" id="error-path">请选择工具链路径</div>
+      </div>
+
+      <div class="form-group">
+        <label for="compiler-name">编译器可执行文件名</label>
+        <input type="text" id="compiler-name" value="cl6x.exe" />
+        <div class="help-text">通常为 cl6x.exe</div>
+      </div>
+
+      <div class="form-group">
+        <label for="linker-name">链接器可执行文件名</label>
+        <input type="text" id="linker-name" value="lnk6x.exe" />
+        <div class="help-text">通常为 lnk6x.exe</div>
+      </div>
+
+      <button class="btn-primary" id="btn-validate">验证工具链</button>
+      <span id="validation-result" style="margin-left: 12px;"></span>
+    </div>
+
+    <!-- 按钮组 -->
+    <div class="button-group">
+      <button class="btn-secondary" id="btn-cancel">取消</button>
+      <button class="btn-primary" id="btn-save">保存配置</button>
+    </div>
+  </div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+    const { dialog } = require('@electron/remote');
+    const fs = require('fs');
+    const path = require('path');
+
+    let selectedDetected = null;
+
+    // 显示消息
+    function showMessage(message, type = 'info') {
+      const container = document.getElementById('message-container');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${type}`;
+      messageDiv.textContent = message;
+      container.innerHTML = '';
+      container.appendChild(messageDiv);
+      
+      // 5秒后自动消失
+      setTimeout(() => {
+        messageDiv.remove();
+      }, 5000);
+    }
+
+    // 自动检测工具链
+    document.getElementById('btn-detect').addEventListener('click', async () => {
+      const loading = document.getElementById('detecting-loading');
+      const detectedList = document.getElementById('detected-list');
+      
+      loading.classList.add('active');
+      detectedList.style.display = 'none';
+      
+      // 发送检测请求
+      ipcRenderer.send('detect-ti-cgt-toolchains');
+      
+      ipcRenderer.once('ti-cgt-detected', (event, toolchains) => {
+        loading.classList.remove('active');
+        
+        if (toolchains.length === 0) {
+          showMessage('未检测到 TI CGT C6000 工具链。请确保已安装 Code Composer Studio。', 'warning');
+          return;
+        }
+        
+        // 显示检测结果
+        detectedList.innerHTML = '';
+        toolchains.forEach(tc => {
+          const item = document.createElement('div');
+          item.className = 'detected-item';
+          item.innerHTML = `
+            <div class="detected-item-name">${tc.name}</div>
+            <div class="detected-item-path">路径: ${tc.path}</div>
+          `;
+          item.addEventListener('click', () => {
+            // 移除其他选中状态
+            document.querySelectorAll('.detected-item').forEach(el => {
+              el.classList.remove('selected');
+            });
+            item.classList.add('selected');
+            selectedDetected = tc;
+            
+            // 填充到手动配置表单
+            document.getElementById('toolchain-name').value = tc.name;
+            document.getElementById('toolchain-version').value = tc.version;
+            document.getElementById('toolchain-path').value = tc.path;
+          });
+          detectedList.appendChild(item);
+        });
+        
+        detectedList.style.display = 'block';
+        showMessage(`检测到 ${toolchains.length} 个工具链，请选择一个。`, 'success');
+      });
+    });
+
+    // 浏览文件夹
+    document.getElementById('btn-browse').addEventListener('click', async () => {
+      const result = await dialog.showOpenDialog({
+        title: '选择工具链 bin 目录',
+        properties: ['openDirectory']
+      });
+      
+      if (!result.canceled && result.filePaths.length > 0) {
+        const selectedPath = result.filePaths[0];
+        document.getElementById('toolchain-path').value = selectedPath;
+        
+        // 尝试从路径提取版本号
+        const versionMatch = selectedPath.match(/ti-cgt-c6000[_-](\d+\.\d+\.\d+)/i);
+        if (versionMatch) {
+          document.getElementById('toolchain-version').value = versionMatch[1];
+        }
+      }
+    });
+
+    // 验证工具链
+    document.getElementById('btn-validate').addEventListener('click', () => {
+      const pathInput = document.getElementById('toolchain-path').value.trim();
+      const compilerName = document.getElementById('compiler-name').value.trim();
+      const resultSpan = document.getElementById('validation-result');
+      
+      if (!pathInput) {
+        showMessage('请先输入工具链路径', 'error');
+        return;
+      }
+      
+      const compilerPath = path.join(pathInput, compilerName);
+      
+      resultSpan.textContent = '验证中...';
+      resultSpan.style.color = '#4fc3f7';
+      
+      setTimeout(() => {
+        if (fs.existsSync(compilerPath)) {
+          resultSpan.textContent = '✓ 验证通过';
+          resultSpan.style.color = '#4caf50';
+          showMessage('工具链验证成功！', 'success');
+        } else {
+          resultSpan.textContent = '✗ 验证失败';
+          resultSpan.style.color = '#f44336';
+          showMessage(`未找到编译器: ${compilerPath}`, 'error');
+        }
+      }, 500);
+    });
+
+    // 验证表单
+    function validateForm() {
+      let isValid = true;
+      
+      const name = document.getElementById('toolchain-name').value.trim();
+      const version = document.getElementById('toolchain-version').value.trim();
+      const pathValue = document.getElementById('toolchain-path').value.trim();
+      
+      // 清除之前的错误
+      document.querySelectorAll('.validation-error').forEach(el => {
+        el.classList.remove('show');
+      });
+      
+      if (!name) {
+        document.getElementById('error-name').classList.add('show');
+        isValid = false;
+      }
+      
+      if (!version) {
+        document.getElementById('error-version').classList.add('show');
+        isValid = false;
+      }
+      
+      if (!pathValue) {
+        document.getElementById('error-path').classList.add('show');
+        isValid = false;
+      }
+      
+      return isValid;
+    }
+
+    // 保存配置
+    document.getElementById('btn-save').addEventListener('click', () => {
+      if (!validateForm()) {
+        showMessage('请填写所有必填字段', 'error');
+        return;
+      }
+      
+      const toolchain = {
+        id: `ti-cgt-${document.getElementById('toolchain-version').value.replace(/\./g, '-')}`,
+        name: document.getElementById('toolchain-name').value.trim(),
+        type: 'ti-cgt',
+        path: document.getElementById('toolchain-path').value.trim(),
+        version: document.getElementById('toolchain-version').value.trim(),
+        compiler: document.getElementById('compiler-name').value.trim(),
+        linker: document.getElementById('linker-name').value.trim(),
+        debugger: 'cg_xml.exe',
+        manual: true
+      };
+      
+      // 验证工具链
+      const compilerPath = path.join(toolchain.path, toolchain.compiler);
+      if (!fs.existsSync(compilerPath)) {
+        showMessage(`错误：未找到编译器 ${compilerPath}`, 'error');
+        return;
+      }
+      
+      // 发送保存请求
+      const result = ipcRenderer.sendSync('add-toolchain', toolchain);
+      
+      if (result.success) {
+        showMessage('工具链配置已保存！', 'success');
+        setTimeout(() => {
+          window.close();
+        }, 1500);
+      } else {
+        showMessage(`保存失败：${result.error}`, 'error');
+      }
+    });
+
+    // 取消
+    document.getElementById('btn-cancel').addEventListener('click', () => {
+      window.close();
+    });
+  </script>
+</body>
+</html>

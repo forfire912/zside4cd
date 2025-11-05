@@ -339,6 +339,12 @@ ipcMain.on('detect-toolchains', (event) => {
   event.reply('toolchains-detected', detected);
 });
 
+ipcMain.on('detect-ti-cgt-toolchains', (event) => {
+  console.log('开始检测 TI CGT 工具链...');
+  const detected = toolchainManager.detectTICGT();
+  event.reply('ti-cgt-detected', detected);
+});
+
 ipcMain.on('get-toolchains', (event) => {
   const toolchains = toolchainManager.getToolchains();
   event.returnValue = toolchains;
@@ -362,6 +368,29 @@ ipcMain.on('validate-toolchain', (event, toolchain) => {
 ipcMain.on('select-best-toolchain', (event, processorType) => {
   const toolchain = toolchainManager.selectBestToolchain(processorType);
   event.returnValue = toolchain;
+});
+
+// 打开工具链配置对话框
+ipcMain.on('open-toolchain-config-dialog', (event) => {
+  const configWindow = new BrowserWindow({
+    width: 900,
+    height: 700,
+    parent: mainWindow,
+    modal: true,
+    title: 'TI CGT 工具链配置',
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true
+    }
+  });
+
+  configWindow.loadFile(path.join(__dirname, 'toolchain-config-dialog.html'));
+  
+  // 开发模式下打开开发者工具
+  if (process.env.NODE_ENV === 'development') {
+    configWindow.webContents.openDevTools();
+  }
 });
 
 // 应用生命周期

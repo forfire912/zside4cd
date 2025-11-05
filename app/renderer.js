@@ -382,11 +382,31 @@ function showToolchainManager() {
     logOutput(`  ${index + 1}. ${tc.name} (${tc.type}) - ${tc.path}`);
   });
   
-  // 执行工具链检测
-  const shouldDetect = confirm('是否自动检测系统中的工具链？');
-  if (shouldDetect) {
+  // 显示菜单选项
+  const choice = prompt(
+    '工具链管理选项:\n' +
+    '1 - 自动检测所有工具链\n' +
+    '2 - 配置 TI CGT C6000 工具链\n' +
+    '3 - 查看当前工具链\n' +
+    '\n请输入选项 (1-3):'
+  );
+  
+  if (choice === '1') {
     detectAndShowToolchains();
+  } else if (choice === '2') {
+    openTICGTConfigDialog();
+  } else if (choice === '3') {
+    // 已经在上面显示了
+    logOutput('工具链列表已显示');
   }
+}
+
+/**
+ * 打开 TI CGT 配置对话框
+ */
+function openTICGTConfigDialog() {
+  logOutput('打开 TI CGT 工具链配置界面...');
+  ipcRenderer.send('open-toolchain-config-dialog');
 }
 
 /**

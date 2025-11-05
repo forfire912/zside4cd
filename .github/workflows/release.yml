@@ -1,0 +1,188 @@
+name: 发布构建
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '发布版本号 (例如: v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+jobs:
+  build-standalone:
+    name: 构建独立应用
+    runs-on: windows-latest
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v3
+      
+      - name: 设置 Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: 安装依赖
+        run: npm ci
+      
+      - name: 构建独立应用
+        run: npm run build:standalone
+      
+      - name: 测试独立应用
+        run: npm run test:standalone
+      
+      - name: 打包独立应用
+        run: npm run package:standalone
+      
+      - name: 上传独立应用构建产物
+        uses: actions/upload-artifact@v3
+        with:
+          name: standalone-windows
+          path: |
+            release-standalone/*.exe
+            release-standalone/*.zip
+          retention-days: 30
+  
+  build-extension:
+    name: 构建VSCodium扩展
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v3
+      
+      - name: 设置 Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: 安装依赖
+        run: npm ci
+      
+      - name: 构建VSCodium扩展
+        run: npm run build:extension
+      
+      - name: 测试VSCodium扩展
+        run: npm run test:extension
+      
+      - name: 打包VSCodium扩展
+        run: npm run package:extension
+      
+      - name: 上传VSCodium扩展构建产物
+        uses: actions/upload-artifact@v3
+        with:
+          name: vscodium-extension
+          path: |
+            release-extension/*.vsix
+            release-extension/INSTALL.md
+          retention-days: 30
+  
+  create-release:
+    name: 创建GitHub Release
+    needs: [build-standalone, build-extension]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v3
+      
+      - name: 下载所有构建产物
+        uses: actions/download-artifact@v3
+      
+      - name: 生成发布说明
+        id: release_notes
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          cat > release-notes.md << 'EOF'
+          # ZSide4CD ${VERSION} 发布
+          
+          基于VSCodium的中文化嵌入式开发IDE，专为STM32F429和TI C67XX系列处理器设计。
+          
+          ## 🎯 主要特性
+          
+          - ✅ 完整中文化界面和文档
+          - ✅ STM32F429处理器支持（ARM GCC工具链）
+          - ✅ TI C67XX处理器支持（TI CGT工具链）
+          - ✅ 智能工具链管理（自动检测和配置）
+          - ✅ 完整的编译、调试和烧录功能
+          - ✅ Windows 10/11完整支持
+          
+          ## 📦 下载说明
+          
+          ### 独立应用版（推荐新用户）
+          
+          - **ZSide4CD-${VERSION}-Setup.exe** - Windows安装版（约80MB）
+            - 完整的桌面IDE应用
+            - 开箱即用，无需安装VSCodium
+            - 适合首次使用的用户
+          
+          - **ZSide4CD-${VERSION}-Portable.exe** - Windows便携版
+            - 无需安装，解压即用
+            - 适合需要移动使用的场景
+          
+          ### VSCodium扩展版（推荐VSCodium用户）
+          
+          - **zside4cd-${VERSION}.vsix** - VSCodium扩展包（约5MB）
+            - 轻量级，充分利用VSCodium生态
+            - 需要先安装VSCodium（https://vscodium.com/）
+            - 安装方法请参阅INSTALL.md
+          
+          ## 🚀 快速开始
+          
+          ### 独立应用
+          1. 下载 ZSide4CD-${VERSION}-Setup.exe
+          2. 双击安装
+          3. 启动ZSide4CD
+          4. 创建新的STM32或C67XX项目
+          5. 开始开发！
+          
+          ### VSCodium扩展
+          1. 安装VSCodium（如果尚未安装）
+          2. 下载 zside4cd-${VERSION}.vsix
+          3. 在VSCodium中执行：\`codium --install-extension zside4cd-${VERSION}.vsix\`
+          4. 重启VSCodium
+          5. 在侧边栏找到ZSide4CD图标
+          
+          ## 📚 文档
+          
+          - [用户手册](https://github.com/forfire912/zside4cd/blob/main/docs/user-guide.md)
+          - [快速开始指南](https://github.com/forfire912/zside4cd/blob/main/docs/quick-start.md)
+          - [编译指南](https://github.com/forfire912/zside4cd/blob/main/docs/build-guide.md)
+          - [VSCodium集成说明](https://github.com/forfire912/zside4cd/blob/main/docs/vscodium-integration.md)
+          
+          ## 🐛 问题反馈
+          
+          如遇到问题，请在GitHub Issues中反馈：
+          https://github.com/forfire912/zside4cd/issues
+          
+          ## 📝 更新日志
+          
+          详细更新内容请查看：[CHANGELOG.md](https://github.com/forfire912/zside4cd/blob/main/CHANGELOG.md)
+          
+          ---
+          
+          **许可证**: MIT License
+          **基于**: VSCodium (MIT License)
+          EOF
+          echo "::set-output name=notes::$(cat release-notes.md)"
+      
+      - name: 创建Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ZSide4CD ${{ github.ref_name }}
+          body_path: release-notes.md
+          draft: false
+          prerelease: false
+          files: |
+            standalone-windows/*.exe
+            standalone-windows/*.zip
+            vscodium-extension/*.vsix
+            vscodium-extension/INSTALL.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

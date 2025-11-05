@@ -4,6 +4,8 @@ bower_components/
 
 # 构建输出 (Build Output)
 dist/
+dist-standalone/
+dist-extension/
 build/
 out/
 
@@ -44,6 +46,11 @@ temp/
 *.zip
 *.tar.gz
 *.rar
+*.vsix
+*.exe
+*.dmg
+*.deb
+*.rpm
 
 # 用户配置 (User Settings)
 .env
@@ -61,7 +68,11 @@ temp/
 
 # Electron 打包输出 (Electron Package Output)
 release/
+release-standalone/
+release-extension/
 packages/
+electron-builder.json
+electron-builder-standalone.json
 
 # 调试文件 (Debug Files)
 *.stackdump

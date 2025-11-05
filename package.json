@@ -8,7 +8,17 @@
     "build": "node scripts/build.js",
     "package": "node scripts/package.js",
     "test": "jest",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "build:standalone": "node scripts/build-standalone.js",
+    "build:extension": "node scripts/build-extension.js",
+    "package:standalone": "node scripts/package-standalone.js",
+    "package:extension": "node scripts/package-extension.js",
+    "test:standalone": "node scripts/test-standalone.js",
+    "test:extension": "node scripts/test-extension.js",
+    "release:standalone": "npm run build:standalone && npm run test:standalone && npm run package:standalone",
+    "release:extension": "npm run build:extension && npm run test:extension && npm run package:extension",
+    "release:all": "npm run release:standalone && npm run release:extension",
+    "release": "node scripts/release.js"
   },
   "keywords": [
     "IDE",

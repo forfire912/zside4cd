@@ -30,6 +30,21 @@ function initApp() {
     handleMenuCommand(command);
   });
   
+  // 监听构建输出
+  ipcRenderer.on('build-output', (event, output) => {
+    logOutput(output, 'build');
+  });
+  
+  // 监听调试输出
+  ipcRenderer.on('debug-output', (event, output) => {
+    logOutput(output, 'debug');
+  });
+  
+  // 监听烧录输出
+  ipcRenderer.on('flash-output', (event, output) => {
+    logOutput(output, 'flash');
+  });
+  
   console.log('应用初始化完成');
 }
 
@@ -258,21 +273,35 @@ function updateProjectTree(projectPath) {
 /**
  * 构建项目
  */
-function buildProject() {
+async function buildProject() {
   if (!currentProject) {
     logOutput('错误: 未打开项目', 'error');
     return;
   }
   
-  logOutput('=== 开始构建 ===');
+  // 获取当前工具链
+  const toolchain = ipcRenderer.sendSync('get-current-toolchain');
+  if (!toolchain) {
+    logOutput('错误: 未配置工具链，请先配置工具链', 'error');
+    return;
+  }
+  
+  logOutput('=== 开始构建 ===\n');
   updateStatus('正在构建...');
   
-  // TODO: 实现实际的构建逻辑
-  setTimeout(() => {
-    logOutput('构建功能正在开发中...');
-    logOutput('=== 构建完成 ===');
-    updateStatus('构建完成');
-  }, 1000);
+  try {
+    const result = await ipcRenderer.invoke('build-project', currentProject, toolchain);
+    
+    if (result.success) {
+      updateStatus('构建成功');
+    } else {
+      logOutput(`\n构建失败: ${result.error}`, 'error');
+      updateStatus('构建失败');
+    }
+  } catch (error) {
+    logOutput(`构建错误: ${error.message}`, 'error');
+    updateStatus('构建失败');
+  }
 }
 
 /**
@@ -292,64 +321,135 @@ function rebuildProject() {
 /**
  * 清理项目
  */
-function cleanProject() {
+async function cleanProject() {
   if (!currentProject) {
     logOutput('错误: 未打开项目', 'error');
     return;
   }
   
-  logOutput('清理构建文件...');
+  logOutput('清理构建文件...\n');
   updateStatus('正在清理...');
   
-  // TODO: 实现实际的清理逻辑
-  setTimeout(() => {
-    logOutput('清理完成');
+  try {
+    const result = await ipcRenderer.invoke('clean-build', currentProject.path);
+    
+    if (result.success) {
+      logOutput('✓ 清理完成\n');
+      updateStatus('就绪');
+    } else {
+      logOutput(`清理失败: ${result.error}`, 'error');
+      updateStatus('就绪');
+    }
+  } catch (error) {
+    logOutput(`清理错误: ${error.message}`, 'error');
     updateStatus('就绪');
-  }, 500);
+  }
 }
 
 /**
  * 启动调试
  */
-function startDebug() {
+async function startDebug() {
   if (!currentProject) {
     logOutput('错误: 未打开项目', 'error');
     return;
   }
   
-  logOutput('=== 启动调试 ===');
+  // 获取当前工具链
+  const toolchain = ipcRenderer.sendSync('get-current-toolchain');
+  if (!toolchain) {
+    logOutput('错误: 未配置工具链，请先配置工具链', 'error');
+    return;
+  }
+  
+  // 确定ELF文件路径
+  const buildDir = path.join(currentProject.path, 'build');
+  let elfFile;
+  
+  if (currentProject.processorType === 'stm32') {
+    elfFile = path.join(buildDir, currentProject.name + '.elf');
+  } else if (currentProject.processorType === 'c67xx') {
+    elfFile = path.join(buildDir, currentProject.name + '.out');
+  }
+  
+  if (!fs.existsSync(elfFile)) {
+    logOutput('错误: 未找到可执行文件，请先构建项目', 'error');
+    return;
+  }
+  
+  logOutput('=== 启动调试会话 ===\n');
   updateStatus('正在调试...');
   
-  // TODO: 实现实际的调试逻辑
-  logOutput('调试功能正在开发中...');
+  try {
+    const result = await ipcRenderer.invoke('start-debug', currentProject, toolchain, elfFile);
+    
+    if (result.success) {
+      updateStatus('调试中');
+    } else {
+      logOutput(`\n调试启动失败: ${result.error}`, 'error');
+      updateStatus('就绪');
+    }
+  } catch (error) {
+    logOutput(`调试错误: ${error.message}`, 'error');
+    updateStatus('就绪');
+  }
 }
 
 /**
  * 停止调试
  */
-function stopDebug() {
-  logOutput('停止调试');
-  updateStatus('就绪');
+async function stopDebug() {
+  logOutput('停止调试会话\n');
+  
+  try {
+    await ipcRenderer.invoke('stop-debug');
+    logOutput('✓ 调试会话已停止\n');
+    updateStatus('就绪');
+  } catch (error) {
+    logOutput(`停止调试失败: ${error.message}`, 'error');
+  }
 }
 
 /**
  * 烧录程序
  */
-function flashProgram() {
+async function flashProgram() {
   if (!currentProject) {
     logOutput('错误: 未打开项目', 'error');
     return;
   }
   
-  logOutput('=== 开始烧录程序 ===');
+  // 确定烧录文件路径
+  const buildDir = path.join(currentProject.path, 'build');
+  let binaryFile;
+  
+  if (currentProject.processorType === 'stm32') {
+    binaryFile = path.join(buildDir, currentProject.name + '.hex');
+  } else if (currentProject.processorType === 'c67xx') {
+    binaryFile = path.join(buildDir, currentProject.name + '.out');
+  }
+  
+  if (!fs.existsSync(binaryFile)) {
+    logOutput('错误: 未找到烧录文件，请先构建项目', 'error');
+    return;
+  }
+  
+  logOutput('=== 开始烧录程序 ===\n');
   updateStatus('正在烧录...');
   
-  // TODO: 实现实际的烧录逻辑
-  setTimeout(() => {
-    logOutput('烧录功能正在开发中...');
-    logOutput('=== 烧录完成 ===');
-    updateStatus('烧录完成');
-  }, 2000);
+  try {
+    const result = await ipcRenderer.invoke('flash-program', currentProject, binaryFile);
+    
+    if (result.success) {
+      updateStatus('烧录完成');
+    } else {
+      logOutput(`\n烧录失败: ${result.error || result.note}`, 'error');
+      updateStatus('烧录失败');
+    }
+  } catch (error) {
+    logOutput(`烧录错误: ${error.message}`, 'error');
+    updateStatus('烧录失败');
+  }
 }
 
 /**

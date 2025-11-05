@@ -12,6 +12,7 @@ class ToolchainManager {
   constructor() {
     this.toolchains = [];
     this.configPath = null;
+    this.currentToolchain = null;
   }
 
   /**
@@ -395,11 +396,26 @@ class ToolchainManager {
     for (const toolchain of availableToolchains) {
       const validation = this.validateToolchain(toolchain);
       if (validation.valid) {
+        this.currentToolchain = toolchain; // 设置为当前工具链
         return toolchain;
       }
     }
 
     return null;
+  }
+
+  /**
+   * 获取当前工具链
+   */
+  getCurrentToolchain() {
+    return this.currentToolchain;
+  }
+
+  /**
+   * 设置当前工具链
+   */
+  setCurrentToolchain(toolchain) {
+    this.currentToolchain = toolchain;
   }
 }
 

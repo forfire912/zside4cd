@@ -9,11 +9,17 @@ const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const ToolchainManager = require('./toolchain-manager');
+const BuildManager = require('./build-manager');
+const DebugManager = require('./debug-manager');
+const FlashManager = require('./flash-manager');
 
 // 全局变量
 let mainWindow = null;
 let config = null;
 let toolchainManager = null;
+let buildManager = null;
+let debugManager = null;
+let flashManager = null;
 
 /**
  * 加载配置
@@ -370,6 +376,11 @@ ipcMain.on('select-best-toolchain', (event, processorType) => {
   event.returnValue = toolchain;
 });
 
+ipcMain.on('get-current-toolchain', (event) => {
+  const toolchain = toolchainManager.getCurrentToolchain();
+  event.returnValue = toolchain;
+});
+
 // 打开工具链配置对话框
 ipcMain.on('open-toolchain-config-dialog', (event) => {
   const configWindow = new BrowserWindow({
@@ -398,9 +409,13 @@ app.whenReady().then(() => {
   console.log('应用已准备就绪');
   loadConfig();
   
-  // 初始化工具链管理器
+  // 初始化管理器
   toolchainManager = new ToolchainManager();
   toolchainManager.initialize(app.getPath('userData'));
+  
+  buildManager = new BuildManager();
+  debugManager = new DebugManager();
+  flashManager = new FlashManager();
   
   // 如果配置为自动检测，则在启动时检测工具链
   if (config.autoDetectToolchains) {
@@ -425,6 +440,135 @@ app.on('window-all-closed', () => {
 
 app.on('before-quit', () => {
   saveConfig();
+  
+  // 停止所有活动会话
+  if (debugManager) {
+    debugManager.stopDebugSession();
+  }
+  if (buildManager) {
+    buildManager.cancelBuild();
+  }
+  if (flashManager) {
+    flashManager.cancelFlash();
+  }
+});
+
+// =============== 构建相关的IPC处理 ===============
+
+// 构建项目
+ipcMain.handle('build-project', async (event, project, toolchain) => {
+  try {
+    const result = await buildManager.buildProject(
+      project,
+      toolchain,
+      (output) => {
+        mainWindow.webContents.send('build-output', output);
+      }
+    );
+    return result;
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// 清理构建
+ipcMain.handle('clean-build', async (event, projectPath) => {
+  try {
+    const result = await buildManager.cleanBuild(projectPath);
+    return { success: result };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// 取消构建
+ipcMain.handle('cancel-build', async () => {
+  const result = buildManager.cancelBuild();
+  return { success: result };
+});
+
+// 获取构建历史
+ipcMain.handle('get-build-history', async () => {
+  return buildManager.getBuildHistory();
+});
+
+// =============== 调试相关的IPC处理 ===============
+
+// 启动调试
+ipcMain.handle('start-debug', async (event, project, toolchain, elfFile) => {
+  try {
+    const result = await debugManager.startDebugSession(
+      project,
+      toolchain,
+      elfFile,
+      (output) => {
+        mainWindow.webContents.send('debug-output', output);
+      }
+    );
+    return { success: true, session: result };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// 停止调试
+ipcMain.handle('stop-debug', async () => {
+  debugManager.stopDebugSession();
+  return { success: true };
+});
+
+// 获取调试会话
+ipcMain.handle('get-debug-session', async () => {
+  return debugManager.getDebugSession();
+});
+
+// 发送GDB命令
+ipcMain.handle('send-gdb-command', async (event, command) => {
+  try {
+    debugManager.sendGDBCommand(command);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// =============== 烧录相关的IPC处理 ===============
+
+// 烧录程序
+ipcMain.handle('flash-program', async (event, project, binaryFile) => {
+  try {
+    const result = await flashManager.flashProgram(
+      project,
+      binaryFile,
+      (output) => {
+        mainWindow.webContents.send('flash-output', output);
+      }
+    );
+    return result;
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// 擦除Flash
+ipcMain.handle('erase-flash', async (event, project) => {
+  try {
+    const result = await flashManager.eraseFlash(
+      project,
+      (output) => {
+        mainWindow.webContents.send('flash-output', output);
+      }
+    );
+    return result;
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// 取消烧录
+ipcMain.handle('cancel-flash', async () => {
+  const result = flashManager.cancelFlash();
+  return { success: result };
 });
 
 console.log('ZSide4CD 主进程已启动');

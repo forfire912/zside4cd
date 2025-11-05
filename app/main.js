@@ -8,10 +8,12 @@
 const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const ToolchainManager = require('./toolchain-manager');
 
 // 全局变量
 let mainWindow = null;
 let config = null;
+let toolchainManager = null;
 
 /**
  * 加载配置
@@ -330,10 +332,53 @@ ipcMain.on('show-save-dialog', async (event, options) => {
   event.reply('save-dialog-result', result);
 });
 
+// 工具链管理 IPC 事件
+ipcMain.on('detect-toolchains', (event) => {
+  console.log('开始检测工具链...');
+  const detected = toolchainManager.detectToolchains();
+  event.reply('toolchains-detected', detected);
+});
+
+ipcMain.on('get-toolchains', (event) => {
+  const toolchains = toolchainManager.getToolchains();
+  event.returnValue = toolchains;
+});
+
+ipcMain.on('add-toolchain', (event, toolchain) => {
+  const result = toolchainManager.addToolchain(toolchain);
+  event.returnValue = result;
+});
+
+ipcMain.on('remove-toolchain', (event, toolchainId) => {
+  const result = toolchainManager.removeToolchain(toolchainId);
+  event.returnValue = result;
+});
+
+ipcMain.on('validate-toolchain', (event, toolchain) => {
+  const result = toolchainManager.validateToolchain(toolchain);
+  event.returnValue = result;
+});
+
+ipcMain.on('select-best-toolchain', (event, processorType) => {
+  const toolchain = toolchainManager.selectBestToolchain(processorType);
+  event.returnValue = toolchain;
+});
+
 // 应用生命周期
 app.whenReady().then(() => {
   console.log('应用已准备就绪');
   loadConfig();
+  
+  // 初始化工具链管理器
+  toolchainManager = new ToolchainManager();
+  toolchainManager.initialize(app.getPath('userData'));
+  
+  // 如果配置为自动检测，则在启动时检测工具链
+  if (config.autoDetectToolchains) {
+    console.log('自动检测工具链...');
+    toolchainManager.detectToolchains();
+  }
+  
   createWindow();
 
   app.on('activate', () => {

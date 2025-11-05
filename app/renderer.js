@@ -217,6 +217,9 @@ function loadProject(projectPath) {
       updateProjectTree(projectPath);
       updateProcessorStatus(projectConfig.processorType);
       
+      // 选择最佳工具链
+      selectToolchainForProject(projectConfig.processorType);
+      
       // 隐藏欢迎屏幕
       document.querySelector('.welcome-screen').style.display = 'none';
     } else {
@@ -226,6 +229,21 @@ function loadProject(projectPath) {
   } catch (error) {
     logOutput(`错误: ${error.message}`, 'error');
     updateStatus('就绪');
+  }
+}
+
+/**
+ * 为项目选择工具链
+ */
+function selectToolchainForProject(processorType) {
+  const toolchain = ipcRenderer.sendSync('select-best-toolchain', processorType);
+  
+  if (toolchain) {
+    logOutput(`已选择工具链: ${toolchain.name}`);
+    document.getElementById('status-toolchain').textContent = toolchain.name;
+  } else {
+    logOutput('警告: 未找到适合的工具链', 'warning');
+    document.getElementById('status-toolchain').textContent = '未配置工具链';
   }
 }
 
@@ -355,7 +373,47 @@ function saveAllFiles() {
  */
 function showToolchainManager() {
   logOutput('打开工具链管理器...');
-  // TODO: 实现工具链管理器界面
+  
+  // 获取当前已配置的工具链
+  const toolchains = ipcRenderer.sendSync('get-toolchains');
+  
+  logOutput(`当前已配置 ${toolchains.length} 个工具链:`);
+  toolchains.forEach((tc, index) => {
+    logOutput(`  ${index + 1}. ${tc.name} (${tc.type}) - ${tc.path}`);
+  });
+  
+  // 执行工具链检测
+  const shouldDetect = confirm('是否自动检测系统中的工具链？');
+  if (shouldDetect) {
+    detectAndShowToolchains();
+  }
+}
+
+/**
+ * 检测并显示工具链
+ */
+function detectAndShowToolchains() {
+  logOutput('正在检测工具链...');
+  updateStatus('正在检测工具链...');
+  
+  ipcRenderer.send('detect-toolchains');
+  
+  ipcRenderer.once('toolchains-detected', (event, detected) => {
+    logOutput(`检测完成，发现 ${detected.length} 个工具链`);
+    
+    if (detected.length > 0) {
+      detected.forEach((tc, index) => {
+        logOutput(`  ${index + 1}. ${tc.name} (${tc.version})`);
+        logOutput(`     路径: ${tc.path}`);
+      });
+      logOutput('工具链信息已保存', 'success');
+    } else {
+      logOutput('未检测到任何工具链', 'warning');
+      logOutput('请确保已安装 ARM GCC 或 TI CGT 工具链');
+    }
+    
+    updateStatus('就绪');
+  });
 }
 
 /**

@@ -65,3 +65,6 @@ packages/
 
 # 调试文件 (Debug Files)
 *.stackdump
+
+# 测试脚本 (Test Scripts)
+test-build.js

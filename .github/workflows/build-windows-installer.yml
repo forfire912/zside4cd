@@ -1,0 +1,53 @@
+name: Build Windows Installer
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-windows-installer:
+    runs-on: windows-latest
+    env:
+      ELECTRON_MIRROR: https://github.com/electron/electron/releases/download
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Build standalone dist
+        run: npm run build:standalone
+
+      - name: Collect toolchain licenses
+        run: node scripts/collect-toolchain-licenses.js || echo "license collection failed"
+
+      - name: Run tests (optional)
+        run: npm run test:standalone || echo "no standalone tests or tests failed"
+
+      - name: Build Windows installer (NSIS)
+        run: npm run build:installer
+
+      - name: Upload release notes & licenses
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-docs
+          path: |
+            docs/release.md
+            dist-standalone/resources/app/licenses/**
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: zside4cd-windows-installer
+          path: |
+            release/**/*.exe
+            release/**/*.msi
+            release/**/*.zip

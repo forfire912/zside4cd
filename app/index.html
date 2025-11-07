@@ -84,6 +84,45 @@
               <p>基于 <a href="https://vscodium.com" target="_blank">VSCodium</a> (MIT License)</p>
               <p>版本 1.0.0 | Copyright © 2025 ZSide4CD Team</p>
             </div>
+
+            <!-- 工具链详情面板 -->
+            <div class="toolchain-panel">
+              <h3>🔧 工具链</h3>
+              <div class="toolchain-actions">
+                <button id="btn-detect-toolchains" class="btn-primary">检测工具链</button>
+                <button id="btn-refresh-toolchains" class="btn-secondary">刷新列表</button>
+              </div>
+              <div id="toolchain-list" class="toolchain-list">
+                <p class="muted">未检测到工具链，点击“检测工具链”以开始。</p>
+              </div>
+
+              <!-- 手动添加工具链表单 -->
+              <div class="toolchain-add-form">
+                <h4>手动添加工具链</h4>
+                <div class="form-row">
+                  <label>名称 <input id="tc-name" type="text" placeholder="例如: ARM GCC 10" /></label>
+                  <label>类型
+                    <select id="tc-type">
+                      <option value="arm-gcc">arm-gcc</option>
+                      <option value="openocd">openocd</option>
+                      <option value="stlink">stlink</option>
+                      <option value="ti-cgt">ti-cgt</option>
+                    </select>
+                  </label>
+                </div>
+                <div class="form-row">
+                  <label>路径 <input id="tc-path" type="text" placeholder="工具链bin目录路径" /></label>
+                </div>
+                <div class="form-row">
+                  <label>编译器 <input id="tc-compiler" type="text" placeholder="例如: arm-none-eabi-gcc.exe" /></label>
+                  <label>链接器 <input id="tc-linker" type="text" placeholder="例如: arm-none-eabi-ld.exe" /></label>
+                  <label>调试器 <input id="tc-debugger" type="text" placeholder="例如: arm-none-eabi-gdb.exe" /></label>
+                </div>
+                <div class="form-row">
+                  <button id="btn-add-toolchain" class="btn-primary">添加工具链</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

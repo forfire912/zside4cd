@@ -73,6 +73,17 @@ function copyAppFiles() {
     }
   });
   
+  // 复制 build 下的已下载工具链到 dist 的 resources/app/toolchains，便于 overlay 到 VSCodium 时使用
+  const buildToolchainsSrc = path.join(__dirname, '..', 'build', 'toolchains');
+  if (fs.existsSync(buildToolchainsSrc)) {
+    const destToolchains = path.join(buildDir, 'resources', 'app', 'toolchains');
+    fs.mkdirSync(destToolchains, { recursive: true });
+    fs.cpSync(buildToolchainsSrc, destToolchains, { recursive: true });
+    log.success('已复制: build/toolchains -> resources/app/toolchains');
+  } else {
+    log.warn('未找到 build/toolchains，跳过复制');
+  }
+
   // 复制许可证文件
   const licenseFiles = ['LICENSE', 'NOTICE', 'README.md'];
   licenseFiles.forEach(file => {
@@ -101,7 +112,8 @@ function createPackageJson() {
     name: packageJson.name,
     version: packageJson.version,
     description: packageJson.description,
-    main: 'app/main.js',
+    // 将入口设置为根下的 main.js（与 files 映射 dist-standalone/app -> "." 一致）
+    main: 'main.js',
     author: packageJson.author,
     license: packageJson.license,
     dependencies: {
@@ -111,6 +123,15 @@ function createPackageJson() {
   
   const packageFile = path.join(buildDir, 'package.json');
   fs.writeFileSync(packageFile, JSON.stringify(standalonePackage, null, 2));
+  
+  // 为了兼容 electron-builder，确保 app 目录下也包含 package.json
+  try {
+    const appPackagePath = path.join(buildDir, 'app', 'package.json');
+    fs.copyFileSync(packageFile, appPackagePath);
+    log.success('app/package.json 已创建（用于打包）');
+  } catch (err) {
+    log.warn('无法复制 package.json 到 app 目录: ' + err.message);
+  }
   
   log.success('package.json已创建');
   return true;

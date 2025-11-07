@@ -46,6 +46,168 @@ function initApp() {
   });
   
   console.log('应用初始化完成');
+  
+  // 监听主进程发送的工具链检测状态
+  ipcRenderer.on('toolchains-status', (event, data) => {
+    console.log('收到工具链检测状态:', data);
+    if (data && Array.isArray(data.list)) {
+      const statusElem = document.getElementById('status-toolchain');
+      if (statusElem) {
+        const first = data.list.find(item => item.valid) || data.list[0] || null;
+        statusElem.textContent = first ? `${first.name} (${first.valid ? '可用' : '不可用'})` : '未配置工具链';
+      }
+    }
+  });
+
+  // 工具链面板相关
+  const btnDetect = document.getElementById('btn-detect-toolchains');
+  const btnRefresh = document.getElementById('btn-refresh-toolchains');
+  const toolchainListElem = document.getElementById('toolchain-list');
+
+  if (btnDetect) {
+    btnDetect.addEventListener('click', () => {
+      logOutput('开始检测工具链...');
+      ipcRenderer.send('detect-toolchains');
+    });
+  }
+
+  if (btnRefresh) {
+    btnRefresh.addEventListener('click', () => {
+      refreshToolchainList();
+    });
+  }
+
+  // 接收检测结果
+  ipcRenderer.on('toolchains-detected', (event, detected) => {
+    logOutput(`检测到 ${detected.length} 个工具链`);
+    refreshToolchainList();
+  });
+
+  function refreshToolchainList() {
+    const list = ipcRenderer.sendSync('get-toolchains') || [];
+    while (toolchainListElem && toolchainListElem.firstChild) toolchainListElem.removeChild(toolchainListElem.firstChild);
+
+    if (!list || list.length === 0) {
+      const p = document.createElement('p');
+      p.className = 'muted';
+      p.textContent = '未检测到工具链，点击“检测工具链”以开始。';
+      toolchainListElem.appendChild(p);
+      return;
+    }
+
+    list.forEach(tc => {
+      const item = document.createElement('div');
+      item.className = 'toolchain-item';
+      
+      // 信息区
+      const info = document.createElement('div');
+      info.className = 'toolchain-info';
+      const title = document.createElement('div');
+      title.innerHTML = `<strong>${tc.name}</strong> <span class="muted">(${tc.type})</span>`;
+      const pth = document.createElement('div');
+      pth.className = 'toolchain-path';
+      pth.textContent = tc.path;
+      info.appendChild(title);
+      info.appendChild(pth);
+      
+      // 操作区按钮（使用图标）
+       const btnValidate = document.createElement('button');
+      btnValidate.innerHTML = '🔍 验证';
+       btnValidate.addEventListener('click', () => {
+         const res = ipcRenderer.sendSync('validate-toolchain', tc);
+         logOutput(`${tc.name} 验证: ${res.valid ? '可用' : '不可用 - ' + res.error}`);
+         refreshToolchainList();
+       });
+ 
+       const btnLocate = document.createElement('button');
+      btnLocate.innerHTML = '📂 打开';
+       btnLocate.addEventListener('click', () => {
+         ipcRenderer.send('show-open-dialog', { title: '工具链目录', defaultPath: tc.path, properties: ['openDirectory'] });
+       });
+ 
+       const btnRemove = document.createElement('button');
+      btnRemove.innerHTML = '🗑️ 移除';
+       btnRemove.addEventListener('click', () => {
+         const res = ipcRenderer.sendSync('remove-toolchain', tc.id);
+         if (res.success) {
+           logOutput(`已移除 ${tc.name}`);
+           refreshToolchainList();
+         } else {
+           logOutput(`移除失败: ${res.error}`, 'error');
+         }
+       });
+ 
+       const actions = document.createElement('div');
+       actions.className = 'toolchain-actions-row';
+       actions.appendChild(btnValidate);
+       actions.appendChild(btnLocate);
+       actions.appendChild(btnRemove);
+ 
+      // 组合信息和操作到同一行
+      item.appendChild(info);
+      item.appendChild(actions);
+      toolchainListElem.appendChild(item);
+    });
+  }
+
+  // 初始刷新
+  refreshToolchainList();
+
+  // 手动添加工具链表单处理
+  const btnAdd = document.getElementById('btn-add-toolchain');
+  const tcPathInput = document.getElementById('tc-path');
+  const tcPathBtn = document.createElement('button');
+  tcPathBtn.textContent = '…';
+  tcPathBtn.title = '选择目录';
+  tcPathBtn.style.marginLeft = '6px';
+  if (tcPathInput && tcPathInput.parentElement) {
+    tcPathInput.parentElement.appendChild(tcPathBtn);
+  }
+
+  if (tcPathBtn) {
+    tcPathBtn.addEventListener('click', async () => {
+      const res = await ipcRenderer.invoke('choose-directory', { properties: ['openDirectory'] });
+      if (res && !res.canceled && res.filePaths && res.filePaths.length) {
+        tcPathInput.value = res.filePaths[0];
+      }
+    });
+  }
+
+  if (btnAdd) {
+    btnAdd.addEventListener('click', () => {
+      const name = document.getElementById('tc-name').value.trim();
+      const type = document.getElementById('tc-type').value;
+      const p = document.getElementById('tc-path').value.trim();
+      const compiler = document.getElementById('tc-compiler').value.trim();
+      const linker = document.getElementById('tc-linker').value.trim();
+      const debuggerExe = document.getElementById('tc-debugger').value.trim();
+
+      if (!name || !p) {
+        logOutput('请填写名称和路径', 'error');
+        return;
+      }
+
+      const toolchain = {
+        id: `${type}-${Date.now()}`,
+        name: name,
+        type: type,
+        path: p,
+        version: '未知',
+        compiler: compiler || undefined,
+        linker: linker || undefined,
+        debugger: debuggerExe || undefined
+      };
+
+      const res = ipcRenderer.sendSync('add-toolchain', toolchain);
+      if (res.success) {
+        logOutput(`已添加工具链: ${name}`);
+        refreshToolchainList();
+      } else {
+        logOutput(`添加工具链失败: ${res.error}`, 'error');
+      }
+    });
+  }
+
 }
 
 /**

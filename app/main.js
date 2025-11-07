@@ -322,6 +322,16 @@ ipcMain.on('get-config', (event) => {
   event.returnValue = config;
 });
 
+// 新增：通过 invoke 弹出选择目录对话框并返回结果
+ipcMain.handle('choose-directory', async (event, options) => {
+  try {
+    const result = await dialog.showOpenDialog(mainWindow, options || { properties: ['openDirectory'] });
+    return result;
+  } catch (error) {
+    return { canceled: true, error: error.message };
+  }
+});
+
 ipcMain.on('save-config', (event, newConfig) => {
   config = { ...config, ...newConfig };
   saveConfig();
@@ -424,6 +434,42 @@ app.whenReady().then(() => {
   }
   
   createWindow();
+
+  // 在窗口加载完成后显示工具链自检结果并通过 IPC 发送到渲染进程
+  mainWindow.webContents.on('did-finish-load', () => {
+    try {
+      const toolchains = toolchainManager.getToolchains() || [];
+      const statusList = toolchains.map(tc => {
+        const validation = toolchainManager.validateToolchain(tc);
+        return {
+          name: tc.name || tc.id || '未知',
+          type: tc.type || 'unknown',
+          version: tc.version || '未知',
+          path: tc.path || '',
+          valid: validation.valid,
+          error: validation.error || null
+        };
+      });
+
+      // 构建消息详情
+      const lines = statusList.map(s => `${s.name} (${s.type}) - ${s.version} - ${s.valid ? '可用' : '不可用: ' + s.error}`);
+      const detail = lines.length ? lines.join('\n') : '未检测到工具链';
+
+      // 主进程显示对话框
+      dialog.showMessageBox(mainWindow, {
+        type: 'info',
+        title: '工具链检测结果',
+        message: '工具链自检完成',
+        detail: detail,
+        buttons: ['确定']
+      }).catch(() => {});
+
+      // 通过 IPC 发送到渲染进程，供 UI 使用
+      mainWindow.webContents.send('toolchains-status', { list: statusList });
+    } catch (error) {
+      console.error('工具链自检失败:', error);
+    }
+  });
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

@@ -2,7 +2,7 @@
   "name": "zside4cd",
   "version": "1.0.0",
   "description": "基于VSCodium的中文化嵌入式开发IDE，支持STM32F429和TI C67XX系列处理器",
-  "main": "app/main.js",
+  "main": "main.js",
   "scripts": {
     "start": "electron app/main.js",
     "build": "node scripts/build.js",
@@ -18,7 +18,8 @@
     "release:standalone": "npm run build:standalone && npm run test:standalone && npm run package:standalone",
     "release:extension": "npm run build:extension && npm run test:extension && npm run package:extension",
     "release:all": "npm run release:standalone && npm run release:extension",
-    "release": "node scripts/release.js"
+    "release": "node scripts/release.js",
+    "build:installer": "electron-builder --win nsis"
   },
   "keywords": [
     "IDE",
@@ -35,15 +36,46 @@
     "url": "https://github.com/forfire912/zside4cd.git"
   },
   "dependencies": {
-    "electron": "^25.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "jest": "^29.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "electron-builder": "^24.6.0",
+    "electron": "^25.0.0"
   },
   "engines": {
     "node": ">=16.0.0",
     "npm": ">=8.0.0"
+  },
+  "build": {
+    "appId": "com.forfire912.zside4cd",
+    "productName": "ZSide4CD",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      { "from": "dist-standalone/app", "to": ".", "filter": ["**/*"] },
+      { "from": "dist-standalone/resources", "to": "resources", "filter": ["**/*"] },
+      { "from": "dist-standalone/extensions", "to": "extensions", "filter": ["**/*"] },
+      { "from": "dist-standalone/version.json", "to": "version.json" }
+    ],
+    "extraResources": [
+      {
+        "from": "build/toolchains/",
+        "to": "resources/app/toolchains",
+        "filter": ["**/*"]
+      }
+    ],
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "asar": true
   }
 }
